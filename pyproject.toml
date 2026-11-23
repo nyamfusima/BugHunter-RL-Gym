@@ -28,6 +28,7 @@ packages = ["src/bughunter"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests"]
 # Challenge assets contain deliberately broken code and tests that must fail on it.
 # They are never collected as part of BugHunter's own test suite.
 norecursedirs = ["src", ".venv", ".git", "*.egg-info"]
@@ -43,6 +44,10 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["bughunter"]
+known-local-folder = ["helpers"]
 
 [tool.ruff.lint.per-file-ignores]
 # Challenge starter code is intentionally buggy and imports the challenge's own `app` package.

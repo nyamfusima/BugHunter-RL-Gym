@@ -54,7 +54,7 @@ class LocalExecutor:
     def run(self, argv: list[str], cwd: Path, timeout: float) -> CommandResult:
         start = time.monotonic()
         try:
-            completed = subprocess.run(  # noqa: S603 - argv is policy-checked, no shell
+            completed = subprocess.run(
                 argv,
                 cwd=cwd,
                 env=scrubbed_env(),
