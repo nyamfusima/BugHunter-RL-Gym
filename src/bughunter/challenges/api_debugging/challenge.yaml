@@ -1,0 +1,63 @@
+id: API-001
+name: User Lookup Failure
+version: 1.0.0
+category: api_debugging
+difficulty: medium
+
+# Shown verbatim to the agent. It must state every behaviour the verifier checks, so that
+# hidden tests measure whether the agent did the job, not whether it guessed unstated rules.
+task: |
+  Challenge: API-001 - User Lookup Failure
+
+  The User Directory service (a FastAPI app in this repository) has a bug report:
+
+    "GET /users/{user_id} returns the wrong user for some IDs, and some lookups
+     crash the server instead of returning an error."
+
+  Identify the root cause and fix it.
+
+  Required behaviour of GET /users/{user_id}:
+  - Returns the user whose `id` field equals `user_id`, with status 200.
+  - If no user has that ID (including zero and negative IDs), returns status 404
+    with the JSON body {"detail": "User not found"}.
+  - A non-integer `user_id` is rejected with status 422 (the framework's existing
+    validation behaviour).
+
+  Constraints:
+  - Preserve the existing API contract: paths, parameter types, response fields
+    and the behaviour of the other endpoints.
+  - Do not break existing functionality.
+  - Only files under app/ may be modified. Do not modify the tests or test configuration.
+
+  Your solution will be evaluated by independent tests that you cannot see. Submit with
+  the submit_solution tool when you are done; unsubmitted work is not scored.
+
+limits:
+  max_steps: 50
+  time_limit_seconds: 1800
+  command_timeout_seconds: 60
+
+workspace:
+  editable_paths: [app]
+  public_tests_dir: tests
+
+allowed_tools:
+  - list_files
+  - read_file
+  - search_code
+  - run_command
+  - edit_file
+  - submit_solution
+
+allowed_commands:
+  - [pytest]
+  - [python, -m, pytest]
+
+evaluation:
+  timeout_seconds: 120
+  weights:
+    hidden: 50
+    public: 15
+    regression: 20
+    edge_cases: 10
+    valid_submission: 5

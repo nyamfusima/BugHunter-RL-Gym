@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bughunter"
+version = "0.1.0"
+description = "An evaluation gym that measures how well AI coding agents debug and repair real software."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+    "gymnasium>=1.0",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "pytest>=8.0",
+    # Challenge runtime dependencies (the broken apps and their verifiers use these).
+    "fastapi>=0.110",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+server = ["uvicorn>=0.29"]
+dev = ["ruff>=0.5", "mypy>=1.10", "types-PyYAML"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bughunter"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Challenge assets contain deliberately broken code and tests that must fail on it.
+# They are never collected as part of BugHunter's own test suite.
+norecursedirs = ["src", ".venv", ".git", "*.egg-info"]
+addopts = "-ra"
+markers = [
+    "integration: runs challenge verifiers in subprocesses (slower)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# Challenge starter code is intentionally buggy and imports the challenge's own `app` package.
+"src/bughunter/challenges/*/starter/**" = ["I"]
+"src/bughunter/challenges/*/public_tests/**" = ["I"]
+"src/bughunter/challenges/*/verifier/**" = ["I"]
+"src/bughunter/challenges/*/reference/**" = ["I"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["bughunter"]
+# Challenge assets are standalone projects, not part of the bughunter package's type surface.
+exclude = ["src/bughunter/challenges/[^/]+/(starter|public_tests|verifier|reference)/"]
+
+[[tool.mypy.overrides]]
+module = ["gymnasium.*"]
+ignore_missing_imports = true
